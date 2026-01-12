@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --bg-color: #f9f9f9;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        .dark-mode {
+            --primary-color: #8a7cff;
+            --secondary-color: #6c5ce7;
+            --accent-color: #ff7aa8;
+            --bg-color: #1a1a2e;
+            --card-color: #16213e;
+            --text-color: #f0f0f0;
+            --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent-color);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mode-toggle {
+            background-color: var(--card-color);
+            border: none;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .mode-toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode .mode-toggle::after {
+            transform: translateX(30px);
+        }
+
+        .hearts {
+            display: flex;
+            gap: 8px;
+            background-color: var(--card-color);
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .heart {
+            color: #ff4757;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .heart.lost {
+            color: #ccc;
+        }
+
+        .heart-restore-timer {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        /* Home Page */
+        .page {
+            display: none;
+            flex: 1;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            color: var(--accent-color);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option {
+            background-color: var(--bg-color);
+            padding: 18px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .option.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(253, 121, 168, 0.1);
+        }
+
+        .option i {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-large {
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            margin-top: 20px;
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            background-color: #ccc;
+            transform: none;
+        }
+
+        .center {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        /* Game Page */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .players {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--card-color);
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        .player.active {
+            border: 2px solid var(--accent-color);
+        }
+
+        .player-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .player-x {
+            background-color: #6c5ce7;
+            color: white;
+        }
+
+        .player-o {
+            background-color: #fd79a8;
+            color: white;
+        }
+
+        .game-info {
+            background-color: var(--card-color);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+
+        .game-board-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            max-height: 65vh;
+            overflow: auto;
+            padding: 10px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-gap: 3px;
+            background-color: var(--primary-color);
+            padding: 3px;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: var(--card-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .cell:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .cell.x {
+            color: #6c5ce7;
+        }
+
+        .cell.o {
+            color: #fd79a8;
+        }
+
+        /* Adjust cell size for different board sizes */
+        .board-3x3 .cell {
+            width: 90px;
+            height: 90px;
+        }
+
+        .board-6x6 .cell {
+            width: 55px;
+            height: 55px;
+            font-size: 1.6rem;
+        }
+
+        .board-9x9 .cell {
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+        }
+
+        .board-11x11 .cell {
+            width: 35px;
+            height: 35px;
+            font-size: 1.1rem;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Selection Modal */
+        .selection-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .selection-modal.active {
+            display: flex;
+        }
+
+        .selection-content {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .selection-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+
+        .selection-content p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .selection-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .selection-option {
+            background-color: var(--bg-color);
+            padding: 20px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .selection-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+        }
+
+        .selection-option.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(253, 121, 168, 0.1);
+        }
+
+        .selection-option i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .selection-option h3 {
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .selection-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* Game Result Modal */
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .result-modal.active {
+            display: flex;
+        }
+
+        .result-content {
+            background-color: var(--card-color);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .result-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .result-content p {
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* No Hearts Modal */
+        .no-hearts-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .no-hearts-modal.active {
+            display: flex;
+        }
+
+        .no-hearts-content {
+            background-color: var(--card-color);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .no-hearts-content h2 {
+            color: #ff4757;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+
+        .no-hearts-content p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            display: inline-block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .board-3x3 .cell {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .board-6x6 .cell {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .board-9x9 .cell {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .board-11x11 .cell {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-controls {
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            
+            .selection-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .selection-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .board-3x3 .cell {
+                width: 70px;
+                height: 70px;
+                font-size: 1.6rem;
+            }
+            
+            .board-6x6 .cell {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            
+            .board-9x9 .cell {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+            }
+            
+            .board-11x11 .cell {
+                width: 25px;
+                height: 25px;
+                font-size: 0.9rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .player {
+                padding: 8px 15px;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .result-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* Selection step indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        
+        .step.completed {
+            background-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>Tic Tac Toe</span>
+            </div>
+            <div class="header-controls">
+                <div class="hearts" id="hearts">
+                    <i class="fas fa-heart heart"></i>
+                    <i class="fas fa-heart heart"></i>
+                    <i class="fas fa-heart heart"></i>
+                    <div class="heart-restore-timer" id="heartTimer"></div>
+                </div>
+                <button class="mode-toggle" id="modeToggle"></button>
+            </div>
+        </header>
+
+        <!-- Home Page -->
+        <div class="page active" id="homePage">
+            <section class="hero">
+                <h1>Tic Tac Toe </h1>
+                <p>Challenge the player with extreme difficulty levels. The classic game reimagined!</p>
+            </section>
+
+            <div class="card">
+                <h2><i class="fas fa-th"></i> Board Selection</h2>
+                <p>Select the board size and required matching sequence to win.</p>
+                <div class="options" id="boardOptions">
+                    <div class="option selected" data-size="3" data-match="3">
+                        <i class="fas fa-border-all"></i>
+                        <h3>3x3 Board</h3>
+                        <p>Match 3 in a row to win</p>
+                    </div>
+                    <div class="option" data-size="6" data-match="4">
+                        <i class="fas fa-border-all"></i>
+                        <h3>6x6 Board</h3>
+                        <p>Match 4 in a row to win</p>
+                    </div>
+                    <div class="option" data-size="9" data-match="5">
+                        <i class="fas fa-border-all"></i>
+                        <h3>9x9 Board</h3>
+                        <p>Match 5 in a row to win</p>
+                    </div>
+                    <div class="option" data-size="11" data-match="6">
+                        <i class="fas fa-border-all"></i>
+                        <h3>11x11 Board</h3>
+                        <p>Match 6 in a row to win</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center">
+                <button class="btn btn-large" id="nextButton">
+                    <i class="fas fa-arrow-right"></i> Next
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Page -->
+        <div class="page" id="gamePage">
+            <div class="game-header">
+                <div class="players">
+                    <div class="player active" id="playerX">
+                        <div class="player-icon player-x">X</div>
+                        <div class="player-info">
+                            <h3>Player X</h3>
+                            <p>You</p>
+                        </div>
+                    </div>
+                    <div class="player" id="playerO">
+                        <div class="player-icon player-o">O</div>
+                        <div class="player-info">
+                            <h3>Player O</h3>
+                            <p id="opponentType">Bot (Easy)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-info">
+                    <span id="currentTurn">Player X's Turn</span>
+                </div>
+            </div>
+
+            <div class="game-board-container">
+                <div class="game-board" id="gameBoard">
+                    <!-- Game board will be generated here -->
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn" id="restartButton">
+                    <i class="fas fa-redo"></i> Restart Game
+                </button>
+                <button class="btn" id="homeButton">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+                <button class="btn" id="newGameButton">
+                    <i class="fas fa-plus-circle"></i> New Board
+                </button>
+            </div>
+        </div>
+
+        <!-- Selection Modal -->
+        <div class="selection-modal" id="selectionModal">
+            <div class="selection-content">
+                <div class="step-indicator" id="stepIndicator">
+                    <div class="step active" id="step1"></div>
+                    <div class="step" id="step2"></div>
+                    <div class="step" id="step3"></div>
+                </div>
+                
+                <h2 id="selectionTitle">Select Game Mode</h2>
+                <p id="selectionDescription">Choose your game mode</p>
+                
+                <div class="selection-options" id="selectionOptions">
+                    <!-- Options will be dynamically inserted -->
+                </div>
+                
+                <div class="selection-buttons">
+                    <button class="btn" id="backButton">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn" id="continueButton">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Result Modal -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-content">
+                <h2 id="resultTitle">Game Over!</h2>
+                <p id="resultMessage">Player X wins the game!</p>
+                <div class="result-buttons">
+                    <button class="btn" id="playAgainButton">
+                        <i class="fas fa-play-circle"></i> Play Again
+                    </button>
+                    <button class="btn" id="modalHomeButton">
+                        <i class="fas fa-home"></i> Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Hearts Modal -->
+        <div class="no-hearts-modal" id="noHeartsModal">
+            <div class="no-hearts-content">
+                <h2><i class="fas fa-heart-broken"></i> Out of Hearts!</h2>
+                <p>You've lost all your hearts. Please wait for hearts to restore before playing again.</p>
+                
+                <div class="timer-display" id="timerDisplay">05:00</div>
+                
+                <p>Hearts restore automatically every 5 minutes.</p>
+                
+                <button class="btn" id="closeNoHeartsButton">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State Variables
+        let gameState = {
+            boardSize: 3,
+            matchToWin: 3,
+            playerType: 'bot',
+            difficulty: 'easy',
+            currentPlayer: 'X',
+            gameBoard: [],
+            gameActive: true,
+            hearts: 3,
+            darkMode: false,
+            playerWins: 0,
+            botWins: 0,
+            maxHearts: 3,
+            heartRestoreTime: 300,
+            heartTimer: null,
+            selectionStep: 1
+        };
+
+        // DOM Elements
+        const homePage = document.getElementById('homePage');
+        const gamePage = document.getElementById('gamePage');
+        const gameBoard = document.getElementById('gameBoard');
+        const heartsContainer = document.getElementById('hearts');
+        const heartTimerElement = document.getElementById('heartTimer');
+        const modeToggle = document.getElementById('modeToggle');
+        const nextButton = document.getElementById('nextButton');
+        const homeButton = document.getElementById('homeButton');
+        const newGameButton = document.getElementById('newGameButton');
+        const restartButton = document.getElementById('restartButton');
+        const resultModal = document.getElementById('resultModal');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const playAgainButton = document.getElementById('playAgainButton');
+        const modalHomeButton = document.getElementById('modalHomeButton');
+        const currentTurnElement = document.getElementById('currentTurn');
+        const playerXElement = document.getElementById('playerX');
+        const playerOElement = document.getElementById('playerO');
+        const opponentTypeElement = document.getElementById('opponentType');
+
+        // Selection modal elements
+        const selectionModal = document.getElementById('selectionModal');
+        const selectionTitle = document.getElementById('selectionTitle');
+        const selectionDescription = document.getElementById('selectionDescription');
+        const selectionOptions = document.getElementById('selectionOptions');
+        const backButton = document.getElementById('backButton');
+        const continueButton = document.getElementById('continueButton');
+        const stepIndicator = document.getElementById('stepIndicator');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+
+        // No hearts modal elements
+        const noHeartsModal = document.getElementById('noHeartsModal');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const closeNoHeartsButton = document.getElementById('closeNoHeartsButton');
+
+        // Option selectors
+        const boardOptions = document.querySelectorAll('#boardOptions .option');
+
+        // Selection steps data
+        const selectionSteps = [
+            {
+                title: "Select Game Mode",
+                description: "Choose your game mode",
+                options: [
+                    { id: 'bot', icon: 'fas fa-robot', title: 'Player vs Bot', description: 'Play against AI opponent' },
+                    { id: 'player', icon: 'fas fa-user', title: 'Player vs Player', description: 'Two players on the same device' }
+                ]
+            },
+            {
+                title: "Select Difficulty Level",
+                description: "Choose the AI difficulty level",
+                options: [
+                    { id: 'easy', icon: 'fas fa-star', title: 'Easy', description: 'Good for beginners' },
+                    { id: 'medium', icon: 'fas fa-star', title: 'Medium', description: 'A balanced challenge' },
+                    { id: 'hard', icon: 'fas fa-star', title: 'Hard', description: 'For experienced players' },
+                    { id: 'expert', icon: 'fas fa-star', title: 'Expert', description: 'Extreme - Nearly unbeatable' }
+                ]
+            }
+        ];
+
+        // Initialize the game
+        function init() {
+            // Load saved game state from localStorage
+            loadGameState();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize the home page
+            updateHeartsDisplay();
+            
+            // Show home page initially
+            switchPage('home');
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const savedHearts = localStorage.getItem('ticTacToeHearts');
+            if (savedHearts !== null) {
+                gameState.hearts = parseInt(savedHearts);
+            }
+            
+            const heartData = localStorage.getItem('ticTacToeHeartData');
+            if (heartData) {
+                try {
+                    const data = JSON.parse(heartData);
+                    const now = Date.now();
+                    const timePassed = Math.floor((now - data.timestamp) / 1000);
+                    
+                    if (data.restoreTime > 0) {
+                        gameState.heartRestoreTime = Math.max(0, data.restoreTime - timePassed);
+                        const heartsRestored = Math.floor(timePassed / 300);
+                        gameState.hearts = Math.min(gameState.maxHearts, gameState.hearts + heartsRestored);
+                        
+                        if (heartsRestored > 0) {
+                            gameState.heartRestoreTime = 300 - (timePassed % 300);
+                        }
+                        
+                        if (gameState.hearts < gameState.maxHearts && gameState.heartRestoreTime > 0) {
+                            startHeartRestoration();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading heart data:', e);
+                }
+            }
+        }
+
+        // Save heart restoration data to localStorage
+        function saveHeartData() {
+            const heartData = {
+                restoreTime: gameState.heartRestoreTime,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('ticTacToeHeartData', JSON.stringify(heartData));
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            modeToggle.addEventListener('click', toggleDarkMode);
+            nextButton.addEventListener('click', () => {
+                if (gameState.hearts <= 0) {
+                    showNoHeartsModal();
+                    return;
+                }
+                showSelectionModal();
+            });
+            
+            homeButton.addEventListener('click', () => switchPage('home'));
+            newGameButton.addEventListener('click', createNewBoard);
+            restartButton.addEventListener('click', restartGame);
+            
+            backButton.addEventListener('click', goBackInSelection);
+            continueButton.addEventListener('click', continueSelection);
+            
+            playAgainButton.addEventListener('click', () => {
+                resultModal.classList.remove('active');
+                if (gameState.hearts <= 0) {
+                    showNoHeartsModal();
+                } else {
+                    restartGame();
+                }
+            });
+            
+            modalHomeButton.addEventListener('click', () => {
+                resultModal.classList.remove('active');
+                switchPage('home');
+            });
+            
+            closeNoHeartsButton.addEventListener('click', () => {
+                noHeartsModal.classList.remove('active');
+                switchPage('home');
+            });
+            
+            boardOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    boardOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    gameState.boardSize = parseInt(option.dataset.size);
+                    gameState.matchToWin = parseInt(option.dataset.match);
+                });
+            });
+
+            window.addEventListener('beforeunload', saveHeartData);
+        }
+
+        // Toggle dark/light mode
+        function toggleDarkMode() {
+            gameState.darkMode = !gameState.darkMode;
+            document.body.classList.toggle('dark-mode', gameState.darkMode);
+        }
+
+        // Update hearts display
+        function updateHeartsDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            hearts.forEach((heart, index) => {
+                if (index < gameState.hearts) {
+                    heart.classList.remove('lost');
+                } else {
+                    heart.classList.add('lost');
+                }
+            });
+            
+            localStorage.setItem('ticTacToeHearts', gameState.hearts.toString());
+            nextButton.disabled = gameState.hearts <= 0;
+            saveHeartData();
+        }
+
+        // Start heart restoration timer
+        function startHeartRestoration() {
+            if (gameState.heartTimer) {
+                clearInterval(gameState.heartTimer);
+            }
+            
+            heartTimerElement.style.display = 'block';
+            updateTimerDisplay();
+            
+            gameState.heartTimer = setInterval(() => {
+                gameState.heartRestoreTime--;
+                updateTimerDisplay();
+                saveHeartData();
+                
+                if (gameState.heartRestoreTime <= 0) {
+                    gameState.hearts = Math.min(gameState.maxHearts, gameState.hearts + 1);
+                    updateHeartsDisplay();
+                    
+                    if (gameState.hearts >= gameState.maxHearts) {
+                        clearInterval(gameState.heartTimer);
+                        heartTimerElement.style.display = 'none';
+                        localStorage.removeItem('ticTacToeHeartData');
+                    } else {
+                        gameState.heartRestoreTime = 300;
+                        saveHeartData();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.heartRestoreTime / 60);
+            const seconds = gameState.heartRestoreTime % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            heartTimerElement.textContent = `Next heart: ${timeString}`;
+            timerDisplay.textContent = timeString;
+        }
+
+        // Show no hearts modal
+        function showNoHeartsModal() {
+            if (gameState.hearts === 0 && !gameState.heartTimer) {
+                gameState.heartRestoreTime = 300;
+                startHeartRestoration();
+            }
+            updateTimerDisplay();
+            noHeartsModal.classList.add('active');
+        }
+
+        // Switch between home and game pages
+        function switchPage(page) {
+            if (page === 'home') {
+                homePage.classList.add('active');
+                gamePage.classList.remove('active');
+            } else if (page === 'game') {
+                homePage.classList.remove('active');
+                gamePage.classList.add('active');
+            }
+        }
+
+        // Show selection modal
+        function showSelectionModal() {
+            gameState.selectionStep = 1;
+            updateSelectionModal();
+            selectionModal.classList.add('active');
+        }
+
+        // Update selection modal based on current step
+        function updateSelectionModal() {
+            step1.classList.toggle('active', gameState.selectionStep === 1);
+            step1.classList.toggle('completed', gameState.selectionStep > 1);
+            step2.classList.toggle('active', gameState.selectionStep === 2);
+            step2.classList.toggle('completed', gameState.selectionStep > 2);
+            step3.classList.toggle('active', gameState.selectionStep === 3);
+            
+            let currentStep;
+            if (gameState.selectionStep === 1) {
+                currentStep = selectionSteps[0];
+            } else if (gameState.selectionStep === 2) {
+                currentStep = selectionSteps[1];
+                if (gameState.playerType !== 'bot') {
+                    gameState.selectionStep = 3;
+                    updateSelectionModal();
+                    return;
+                }
+            } else if (gameState.selectionStep === 3) {
+                selectionModal.classList.remove('active');
+                startGame();
+                return;
+            }
+            
+            selectionTitle.textContent = currentStep.title;
+            selectionDescription.textContent = currentStep.description;
+            selectionOptions.innerHTML = '';
+            
+            currentStep.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'selection-option';
+                optionElement.dataset.id = option.id;
+                
+                optionElement.innerHTML = `
+                    <i class="${option.icon}"></i>
+                    <h3>${option.title}</h3>
+                    <p>${option.description}</p>
+                `;
+                
+                if (gameState.selectionStep === 1 && option.id === gameState.playerType) {
+                    optionElement.classList.add('selected');
+                } else if (gameState.selectionStep === 2 && option.id === gameState.difficulty) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.addEventListener('click', () => {
+                    selectionOptions.querySelectorAll('.selection-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    optionElement.classList.add('selected');
+                    
+                    if (gameState.selectionStep === 1) {
+                        gameState.playerType = option.id;
+                    } else if (gameState.selectionStep === 2) {
+                        gameState.difficulty = option.id;
+                    }
+                });
+                
+                selectionOptions.appendChild(optionElement);
+            });
+            
+            backButton.style.display = 'inline-flex';
+        }
+
+        // Go back in selection process
+        function goBackInSelection() {
+            if (gameState.selectionStep > 1) {
+                gameState.selectionStep--;
+                updateSelectionModal();
+            } else {
+                selectionModal.classList.remove('active');
+            }
+        }
+
+        // Continue in selection process
+        function continueSelection() {
+            const selectedOption = selectionOptions.querySelector('.selected');
+            if (!selectedOption) {
+                alert('Please select an option to continue');
+                return;
+            }
+            
+            if (gameState.selectionStep === 1) {
+                gameState.playerType = selectedOption.dataset.id;
+            } else if (gameState.selectionStep === 2) {
+                gameState.difficulty = selectedOption.dataset.id;
+            }
+            
+            gameState.selectionStep++;
+            updateSelectionModal();
+        }
+
+        // Start the game
+        function startGame() {
+            if (gameState.hearts <= 0) {
+                showNoHeartsModal();
+                return;
+            }
+            
+            if (gameState.playerType === 'bot') {
+                opponentTypeElement.textContent = `Bot (${gameState.difficulty.charAt(0).toUpperCase() + gameState.difficulty.slice(1)})`;
+            } else {
+                opponentTypeElement.textContent = 'Player 2';
+            }
+            
+            switchPage('game');
+            createNewBoard();
+        }
+
+        // Create a new game board
+        function createNewBoard() {
+            gameState.currentPlayer = 'X';
+            gameState.gameActive = true;
+            gameState.gameBoard = Array(gameState.boardSize).fill().map(() => Array(gameState.boardSize).fill(''));
+            updatePlayerTurn();
+            renderBoard();
+        }
+
+        // Restart the current game
+        function restartGame() {
+            if (gameState.hearts <= 0) {
+                showNoHeartsModal();
+                return;
+            }
+            createNewBoard();
+        }
+
+        // Render the game board
+        function renderBoard() {
+            gameBoard.innerHTML = '';
+            gameBoard.classList.remove('board-3x3', 'board-6x6', 'board-9x9', 'board-11x11');
+            gameBoard.classList.add(`board-${gameState.boardSize}x${gameState.boardSize}`);
+            gameBoard.style.gridTemplateColumns = `repeat(${gameState.boardSize}, 1fr)`;
+            
+            for (let row = 0; row < gameState.boardSize; row++) {
+                for (let col = 0; col < gameState.boardSize; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    if (gameState.gameBoard[row][col] === 'X') {
+                        cell.textContent = 'X';
+                        cell.classList.add('x');
+                    } else if (gameState.gameBoard[row][col] === 'O') {
+                        cell.textContent = 'O';
+                        cell.classList.add('o');
+                    }
+                    
+                    cell.addEventListener('click', () => handleCellClick(row, col));
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        // Handle cell click
+        function handleCellClick(row, col) {
+            if (!gameState.gameActive || gameState.gameBoard[row][col] !== '') {
+                return;
+            }
+            
+            makeMove(row, col, gameState.currentPlayer);
+            
+            if (checkWin(gameState.currentPlayer)) {
+                endGame(`${gameState.currentPlayer === 'X' ? 'Player X' : 'Player O'} wins!`, false);
+                return;
+            }
+            
+            if (checkDraw()) {
+                endGame("It's a draw!", true);
+                return;
+            }
+            
+            gameState.currentPlayer = gameState.currentPlayer === 'X' ? 'O' : 'X';
+            updatePlayerTurn();
+            
+            if (gameState.playerType === 'bot' && gameState.currentPlayer === 'O' && gameState.gameActive) {
+                setTimeout(makeBotMove, 500);
+            }
+        }
+
+        // Make a move on the board
+        function makeMove(row, col, player) {
+            gameState.gameBoard[row][col] = player;
+            renderBoard();
+        }
+
+        // Update the player turn display
+        function updatePlayerTurn() {
+            currentTurnElement.textContent = `${gameState.currentPlayer === 'X' ? 'Player X' : 'Player O'}'s Turn`;
+            
+            if (gameState.currentPlayer === 'X') {
+                playerXElement.classList.add('active');
+                playerOElement.classList.remove('active');
+            } else {
+                playerXElement.classList.remove('active');
+                playerOElement.classList.add('active');
+            }
+        }
+
+        // Make a move for the bot - FIXED FOR ALL BOARD SIZES
+        function makeBotMove() {
+            if (!gameState.gameActive) return;
+            
+            let row, col;
+            
+            // Different strategies based on difficulty
+            switch(gameState.difficulty) {
+                case 'easy':
+                    // Easy: Mostly random
+                    if (Math.random() < 0.3) {
+                        [row, col] = getSmartMove();
+                    } else {
+                        [row, col] = getRandomMove();
+                    }
+                    break;
+                    
+                case 'medium':
+                    // Medium: Smart moves 60% of the time
+                    if (Math.random() < 0.6) {
+                        [row, col] = getSmartMove();
+                    } else {
+                        [row, col] = getRandomMove();
+                    }
+                    break;
+                    
+                case 'hard':
+                    // Hard: Very smart moves 80% of the time
+                    if (Math.random() < 0.8) {
+                        [row, col] = getEnhancedSmartMove();
+                    } else {
+                        [row, col] = getSmartMove();
+                    }
+                    break;
+                    
+                case 'expert':
+                    // Expert: Uses advanced heuristics for all board sizes
+                    [row, col] = getExpertMove();
+                    break;
+            }
+            
+            // Make the move
+            makeMove(row, col, 'O');
+            
+            // Check for win or draw
+            if (checkWin('O')) {
+                endGame("Bot wins!", false);
+                if (gameState.playerType === 'bot') {
+                    gameState.hearts = Math.max(0, gameState.hearts - 1);
+                    updateHeartsDisplay();
+                    
+                    if (gameState.hearts === 0) {
+                        gameState.heartRestoreTime = 300;
+                        startHeartRestoration();
+                    }
+                }
+                return;
+            }
+            
+            if (checkDraw()) {
+                endGame("It's a draw!", true);
+                return;
+            }
+            
+            // Switch back to player
+            gameState.currentPlayer = 'X';
+            updatePlayerTurn();
+        }
+
+        // Get a random empty cell
+        function getRandomMove() {
+            const emptyCells = [];
+            
+            for (let row = 0; row < gameState.boardSize; row++) {
+                for (let col = 0; col < gameState.boardSize; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        emptyCells.push([row, col]);
+                    }
+                }
+            }
+            
+            if (emptyCells.length === 0) return [0, 0];
+            
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            return emptyCells[randomIndex];
+        }
+
+        // Get a smart move (tries to win or block) - WORKING FOR ALL BOARDS
+        function getSmartMove() {
+            const size = gameState.boardSize;
+            
+            // Try to win
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'O';
+                        if (checkWin('O')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // Try to block player from winning
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'X';
+                        if (checkWin('X')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // Take center if available
+            const center = Math.floor(size / 2);
+            if (gameState.boardSize % 2 === 1 && gameState.gameBoard[center][center] === '') {
+                return [center, center];
+            }
+            
+            // Try corners
+            const corners = [
+                [0, 0],
+                [0, size - 1],
+                [size - 1, 0],
+                [size - 1, size - 1]
+            ];
+            
+            const availableCorners = corners.filter(([row, col]) => gameState.gameBoard[row][col] === '');
+            if (availableCorners.length > 0) {
+                const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
+                return randomCorner;
+            }
+            
+            // Otherwise random move
+            return getRandomMove();
+        }
+
+        // Enhanced smart move for larger boards
+        function getEnhancedSmartMove() {
+            const size = gameState.boardSize;
+            
+            // Try to win
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'O';
+                        if (checkWin('O')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // Try to block player
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'X';
+                        if (checkWin('X')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // Look for strategic positions
+            const strategicMoves = [];
+            
+            // Center control
+            const center = Math.floor(size / 2);
+            if (gameState.gameBoard[center][center] === '') {
+                strategicMoves.push({row: center, col: center, score: 10});
+            }
+            
+            // Look for positions near existing O's
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        let score = 0;
+                        
+                        // Check adjacent cells for O's
+                        const directions = [
+                            [-1, -1], [-1, 0], [-1, 1],
+                            [0, -1],           [0, 1],
+                            [1, -1],  [1, 0],  [1, 1]
+                        ];
+                        
+                        for (const [dr, dc] of directions) {
+                            const newRow = row + dr;
+                            const newCol = col + dc;
+                            if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
+                                if (gameState.gameBoard[newRow][newCol] === 'O') {
+                                    score += 3;
+                                } else if (gameState.gameBoard[newRow][newCol] === 'X') {
+                                    score += 1;
+                                }
+                            }
+                        }
+                        
+                        // Prefer center positions for larger boards
+                        const distFromCenter = Math.abs(row - center) + Math.abs(col - center);
+                        score += Math.max(0, 5 - distFromCenter);
+                        
+                        strategicMoves.push({row, col, score});
+                    }
+                }
+            }
+            
+            if (strategicMoves.length > 0) {
+                strategicMoves.sort((a, b) => b.score - a.score);
+                return [strategicMoves[0].row, strategicMoves[0].col];
+            }
+            
+            return getRandomMove();
+        }
+
+        // Expert move - advanced heuristics for all board sizes
+        function getExpertMove() {
+            const size = gameState.boardSize;
+            
+            // For 3x3, use minimax (perfect play)
+            if (size === 3) {
+                return getBestMove();
+            }
+            
+            // For larger boards, use advanced pattern recognition
+            
+            // 1. Try to win immediately
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'O';
+                        if (checkWin('O')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // 2. Block opponent from winning
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'X';
+                        if (checkWin('X')) {
+                            gameState.gameBoard[row][col] = '';
+                            return [row, col];
+                        }
+                        gameState.gameBoard[row][col] = '';
+                    }
+                }
+            }
+            
+            // 3. Look for patterns where we can create threats
+            const threateningMoves = analyzeBoardPatterns();
+            if (threateningMoves.length > 0) {
+                // Sort by threat level and choose the best
+                threateningMoves.sort((a, b) => b.threatLevel - a.threatLevel);
+                return [threateningMoves[0].row, threateningMoves[0].col];
+            }
+            
+            // 4. Control the center area
+            const centerArea = getCenterAreaMoves();
+            if (centerArea.length > 0) {
+                return centerArea[0];
+            }
+            
+            // 5. Fallback to enhanced smart move
+            return getEnhancedSmartMove();
+        }
+
+        // Analyze board patterns for threats
+        function analyzeBoardPatterns() {
+            const size = gameState.boardSize;
+            const match = gameState.matchToWin;
+            const threats = [];
+            
+            // Check for patterns where O has match-2 in a row with empty spaces
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col <= size - match; col++) {
+                    let oCount = 0;
+                    let emptySpots = [];
+                    
+                    for (let k = 0; k < match; k++) {
+                        const cell = gameState.gameBoard[row][col + k];
+                        if (cell === 'O') oCount++;
+                        else if (cell === '') emptySpots.push({row, col: col + k});
+                        else if (cell === 'X') { oCount = -1; break; }
+                    }
+                    
+                    if (oCount === match - 2 && emptySpots.length === 2) {
+                        // This is a good pattern to build on
+                        emptySpots.forEach(spot => {
+                            threats.push({
+                                row: spot.row,
+                                col: spot.col,
+                                threatLevel: 8
+                            });
+                        });
+                    }
+                }
+            }
+            
+            return threats;
+        }
+
+        // Get moves in the center area
+        function getCenterAreaMoves() {
+            const size = gameState.boardSize;
+            const center = Math.floor(size / 2);
+            const centerMoves = [];
+            
+            // Define center area (3x3 for large boards, smaller for small boards)
+            const areaSize = Math.min(3, Math.floor(size / 2));
+            const startRow = Math.max(0, center - areaSize);
+            const endRow = Math.min(size - 1, center + areaSize);
+            const startCol = Math.max(0, center - areaSize);
+            const endCol = Math.min(size - 1, center + areaSize);
+            
+            for (let row = startRow; row <= endRow; row++) {
+                for (let col = startCol; col <= endCol; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        centerMoves.push([row, col]);
+                    }
+                }
+            }
+            
+            if (centerMoves.length > 0) {
+                // Shuffle and return the first one
+                for (let i = centerMoves.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [centerMoves[i], centerMoves[j]] = [centerMoves[j], centerMoves[i]];
+                }
+                return centerMoves;
+            }
+            
+            return [];
+        }
+
+        // Get the best move using minimax (for 3x3 only)
+        function getBestMove() {
+            let bestScore = -Infinity;
+            let bestMove;
+            
+            for (let row = 0; row < gameState.boardSize; row++) {
+                for (let col = 0; col < gameState.boardSize; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        gameState.gameBoard[row][col] = 'O';
+                        let score = minimax(gameState.gameBoard, 0, false, -Infinity, Infinity);
+                        gameState.gameBoard[row][col] = '';
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestMove = [row, col];
+                        }
+                    }
+                }
+            }
+            
+            return bestMove || getRandomMove();
+        }
+
+        // Minimax algorithm with alpha-beta pruning for 3x3 tic-tac-toe
+        function minimax(board, depth, isMaximizing, alpha, beta) {
+            if (checkWin('O')) return 10 - depth;
+            if (checkWin('X')) return depth - 10;
+            if (checkDraw()) return 0;
+            
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let row = 0; row < gameState.boardSize; row++) {
+                    for (let col = 0; col < gameState.boardSize; col++) {
+                        if (board[row][col] === '') {
+                            board[row][col] = 'O';
+                            let score = minimax(board, depth + 1, false, alpha, beta);
+                            board[row][col] = '';
+                            bestScore = Math.max(score, bestScore);
+                            alpha = Math.max(alpha, bestScore);
+                            if (beta <= alpha) break;
+                        }
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let row = 0; row < gameState.boardSize; row++) {
+                    for (let col = 0; col < gameState.boardSize; col++) {
+                        if (board[row][col] === '') {
+                            board[row][col] = 'X';
+                            let score = minimax(board, depth + 1, true, alpha, beta);
+                            board[row][col] = '';
+                            bestScore = Math.min(score, bestScore);
+                            beta = Math.min(beta, bestScore);
+                            if (beta <= alpha) break;
+                        }
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        // Check for a win - FIXED FOR ALL BOARD SIZES
+        function checkWin(player) {
+            const board = gameState.gameBoard;
+            const size = gameState.boardSize;
+            const match = gameState.matchToWin;
+            
+            // Check rows
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col <= size - match; col++) {
+                    let win = true;
+                    for (let k = 0; k < match; k++) {
+                        if (board[row][col + k] !== player) {
+                            win = false;
+                            break;
+                        }
+                    }
+                    if (win) return true;
+                }
+            }
+            
+            // Check columns
+            for (let col = 0; col < size; col++) {
+                for (let row = 0; row <= size - match; row++) {
+                    let win = true;
+                    for (let k = 0; k < match; k++) {
+                        if (board[row + k][col] !== player) {
+                            win = false;
+                            break;
+                        }
+                    }
+                    if (win) return true;
+                }
+            }
+            
+            // Check diagonals (top-left to bottom-right)
+            for (let row = 0; row <= size - match; row++) {
+                for (let col = 0; col <= size - match; col++) {
+                    let win = true;
+                    for (let k = 0; k < match; k++) {
+                        if (board[row + k][col + k] !== player) {
+                            win = false;
+                            break;
+                        }
+                    }
+                    if (win) return true;
+                }
+            }
+            
+            // Check diagonals (top-right to bottom-left)
+            for (let row = 0; row <= size - match; row++) {
+                for (let col = match - 1; col < size; col++) {
+                    let win = true;
+                    for (let k = 0; k < match; k++) {
+                        if (board[row + k][col - k] !== player) {
+                            win = false;
+                            break;
+                        }
+                    }
+                    if (win) return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Check for a draw
+        function checkDraw() {
+            for (let row = 0; row < gameState.boardSize; row++) {
+                for (let col = 0; col < gameState.boardSize; col++) {
+                    if (gameState.gameBoard[row][col] === '') {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // End the game
+        function endGame(message, isDraw) {
+            gameState.gameActive = false;
+            resultTitle.textContent = isDraw ? "Game Draw!" : "Game Over!";
+            resultMessage.textContent = message;
+            
+            if (gameState.hearts > 0) {
+                playAgainButton.style.display = 'inline-flex';
+            } else {
+                playAgainButton.style.display = 'none';
+            }
+            
+            setTimeout(() => {
+                resultModal.classList.add('active');
+            }, 500);
+        }
+
+        // Initialize the game when the page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
